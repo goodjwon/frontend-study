@@ -1,44 +1,20 @@
-// JSON 데이터 예시 (chk[]의 값들을 모두 수집한 결과)
-var items = [
-    {
-        "rnum": "25",
-        "rc_estimate_code": "2024072100043",
-        "status": "3",
-        "estimate_quantity": "1",
-        "estimate_amt": "5000",
-        "delivery_fee": "0",
-        "estimate_price": "5000",
-        "estimate_validate_dt": "20240804",
-        "delivery_fee_kind": "1",
-        "delivery_group_yn": "Y",
-        "remain_qnt": "1980",
-        "goods_name": "색연필에듀테크",
-        "size": "188*12612색1개",
-        "credit_str": "각",
-        "model": "",
-        "goods_status": "3",
-        "edu_sync_yn": "N",
-        "re_estimate_code": "202209134900136",
-        "estimate_doc_print": "색연필에듀테크|2008120500037|2024072100043|5000|5000|",
-        "company_code_b": "2008120500037",
-        "company_name_b": "테스트공급업체11004",
-        "nego_req_f_data": "2024072100043####2008120500037#",
-        "rc_estimate_code_org": "2024071124445",
-        "gift_card": "",
-        "delivery_fee_limit": "0",
-        "enterprises_classification_code": "01:::::03:::::05:::::11:::::143:::::166:::::168:::::90",
-        "uid3": "4810209901",
-        "pd_cert_file": "",
-        "smpp_pd_cert": "",
-        "sale_type": "1",
-        "keyword2": "",
-        "delivery_jeju_fee": "0"
+const fs = require('fs').promises;
+const path = '../asset/cart.json'; // JSON 파일 경로
+
+// JSON 데이터를 로드하는 함수
+async function loadCartData() {
+    try {
+        const data = await fs.readFile(path, 'utf8');
+        const items = JSON.parse(data);
+        return items;
+    } catch (error) {
+        console.error('Error loading cart data:', error);
+        return [];
     }
-    // 추가 데이터...
-];
+}
 
 // 총액 계산 함수
-function calculateTotalAmount() {
+function calculateTotalAmount(items) {
     let totalAmount = 0;
 
     items.forEach(function(item) {
@@ -53,23 +29,19 @@ function calculateTotalAmount() {
 }
 
 // 수량 변경 함수
-function changeQuantity() {
+function changeQuantity(items) {
     items.forEach(function(item) {
         let maxQuantity = parseInt(item.remain_qnt);
-        let newQuantity = prompt(`Enter new quantity for ${item.goods_name} (max ${maxQuantity}):`, item.estimate_quantity);
-        
-        if (newQuantity > 0 && newQuantity <= maxQuantity) {
-            item.estimate_quantity = newQuantity;
-        } else {
-            alert(`Invalid quantity for ${item.goods_name}.`);
-        }
+        let newQuantity = Math.min(Math.max(1, parseInt(item.estimate_quantity)), maxQuantity);
+        item.estimate_quantity = newQuantity;
+        console.log(`Quantity updated for ${item.goods_name}: ${newQuantity}`);
     });
 }
 
 // 조건부 배송비 계산 함수
-function calculateConditionalDeliveryFee() {
+function calculateConditionalDeliveryFee(items) {
     let freeShippingThreshold = 300000;
-    let totalAmount = calculateTotalAmount();
+    let totalAmount = calculateTotalAmount(items);
 
     if (totalAmount >= freeShippingThreshold) {
         items.forEach(function(item) {
@@ -82,7 +54,7 @@ function calculateConditionalDeliveryFee() {
 }
 
 // 금액 기준 정렬 함수
-function sortByAmount() {
+function sortByAmount(items) {
     items.sort(function(a, b) {
         return (parseInt(b.estimate_price) * parseInt(b.estimate_quantity)) - (parseInt(a.estimate_price) * parseInt(a.estimate_quantity));
     });
@@ -91,7 +63,7 @@ function sortByAmount() {
 }
 
 // 품명 기준 정렬 함수
-function sortByGoodsName() {
+function sortByGoodsName(items) {
     items.sort(function(a, b) {
         return a.goods_name.localeCompare(b.goods_name);
     });
@@ -100,7 +72,7 @@ function sortByGoodsName() {
 }
 
 // 재고 체크 함수
-function checkStock() {
+function checkStock(items) {
     items.forEach(function(item) {
         if (parseInt(item.remain_qnt) <= 0) {
             console.log(`Out of stock: ${item.goods_name}`);
@@ -111,7 +83,7 @@ function checkStock() {
 }
 
 // 중소기업자 간 경쟁제품 물품 구매 체크 함수
-function checkSMEProductPurchase() {
+function checkSMEProductPurchase(items) {
     items.forEach(function(item) {
         let isSMEProduct = item.enterprises_classification_code.includes("01");
         if (isSMEProduct) {
@@ -123,7 +95,7 @@ function checkSMEProductPurchase() {
 }
 
 // 견적 비교 함수
-function compareEstimates() {
+function compareEstimates(items) {
     let selectedItems = items.slice(0, 5); // 최대 5개 선택
 
     if (selectedItems.length < 2) {
@@ -136,9 +108,9 @@ function compareEstimates() {
 }
 
 // 수의시담 함수
-function negotiateDirectly() {
+function negotiateDirectly(items) {
     items.forEach(function(item) {
-        let negotiationPossible = confirm(`Would you like to negotiate for ${item.goods_name}?`);
+        let negotiationPossible = true; // 수의시담 여부 판단 로직 필요
         if (negotiationPossible) {
             console.log(`Negotiation started for ${item.goods_name}`);
             // 추가 협상 로직
@@ -147,11 +119,29 @@ function negotiateDirectly() {
 }
 
 // 선택 삭제 함수
-function deleteSelectedItems() {
+function deleteSelectedItems(items) {
     items = items.filter(function(item) {
-        let isSelected = confirm(`Would you like to delete ${item.goods_name}?`);
+        let isSelected = false; // 삭제 여부 판단 로직 필요
         return !isSelected;
     });
 
     console.log("Remaining items after deletion:", items);
 }
+
+// 메인 함수 - 모든 작업을 실행
+async function main() {
+    const items = await loadCartData();
+
+    calculateTotalAmount(items);
+    changeQuantity(items);
+    calculateConditionalDeliveryFee(items);
+    sortByAmount(items);
+    sortByGoodsName(items);
+    checkStock(items);
+    checkSMEProductPurchase(items);
+    compareEstimates(items);
+    negotiateDirectly(items);
+    deleteSelectedItems(items);
+}
+
+main();
