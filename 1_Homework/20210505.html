@@ -1,57 +1,84 @@
 <!DOCTYPE html>
 <html lang="ko">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            .header {
-                width: 1660px;
-                height: 80px;
-                border: 2px solid #09c;
-                background-color: #d7f5ff;
-            }
-            .body {
-                display: flex;
-                width: 100%;
-                height: 804px;
-                margin: 0px;
-            }
-            .body .sidebar {
-                min-width: 250px;
-                height: 800px;
-                border: 2px solid red;
-                background-color: #ffe7d5;
-            }
-            .body .main {
-                width: 1394px;
-                height: 780px;
-                border: 2px solid blue;
-                background-color: #e2e9ff;
-                padding: 10px;
-            }
-            .body .main .content_box {
-                width: 1380px;
-                height: 776px;
-                border: 2px solid darkslategray;
-                background-color: darkolivegreen;
-            }
-        </style>
-    </head>
-    <body>
-		<div class="header">header</div>
-		<div class="body">
-		    <div class="sidebar">sidebar</div>
-		    <div class="main">
-                <div class="content_box">
-                    <div class="menu">
-                        <div class="menu_1"></div>
-                        <div class="menu_1"></div>
-                        <div class="menu_1"></div>
-                        <div class="menu_1"></div>
-                    </div>
-                    <div class="content"></div>
-                </div>
-            </div>
-		</div>
-    </body>
-    <script scr=""></script>
+<head>
+    <meta charset="UTF-8">
+    <style>
+
+        /**
+        flex 선언 최상위 wrapper 명칭은 wrapper 혹은 container 라는 단어룰 주료 사용
+         */
+        .container {
+            display: flex;
+            flex-flow: row wrap;
+        }
+
+        /**
+            > 자식 노드 * 선택자 전체 선택
+            https://developer.mozilla.org/ko/docs/Web/CSS/CSS_Selectors
+         */
+        .container > * {
+            flex: 1 100%
+        }
+
+        .header {
+            height: 80px;
+            background-color: #d7f5ff;
+        }
+
+        /*.sidebar {*/
+        /*    background: gold;*/
+        /*    flex: initial; !** 0, 1, auto**!*/
+        /*    min-width: 200px;*/
+        /*    order: 1;*/
+        /*}   아래 참고.. */
+
+        .sidebar {
+            background: gold;
+            flex: 0 1 200px;
+            order: 1;
+        }
+
+        /**
+           padding box 안에 여백
+           margin box 밖에 여백
+           flex 옵션 설명 : https://developer.mozilla.org/ko/docs/Web/CSS/flex
+           flex: grow, shrink, basis
+           grow(자라다) :  flex-item 요소가, flex-container 요소 내부에서 할당 가능한 공간의 정도를 선언합니다
+           shrink(수축) : 만약 flex-item 요소의 크기가 flex-container 요소의 크기보다 클 때 flex-shrink 속성을 사용하는데, 설정된 숫자값에 따라 flex-container 요소 내부에서 flex-item 요소의 크기가 축소됩니
+           basis(기초) : 플렉스 아이템의 초기 크기를 지정합니다. box-sizing을 따로 지정하지 않는다면 콘텐츠 박스의 크기를 변경합니다.
+           order: 순서
+        */
+        .content {
+            text-align: left;
+            background: deepskyblue;
+            padding: 1rem;
+            order: 2;
+            flex: 3 0px;
+        }
+
+        .footer {
+            background-color: #fbbe28;
+            order: 3;
+        }
+
+        body {
+            padding: 1rem;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">header</div>
+    <div class="sidebar">sidebar</div>
+    <div class="content">
+        <p>
+            CSS Flexible Box Layout은 사용자 인터페이스 디자인과 단방향 레이아웃에 최적화된 CSS 모듈입니다. 플렉스 레이아웃 모델에서는, 플렉스 컨테이너의 자식을 어떤 방향으로도 배치할
+            수 있으며, 자식의 크기도 유연하게("플렉시블") 빈 공간을 채우거나, 컨테이너를 넘어가지 않도록 줄어듭니다. 자식 간의 수평 및 수직 정렬 또한 쉽게 조작할 수 있습니다.
+        </p>
+    </div>
+    <div class="footer">footer</div>
+</div>
+</body>
+<script scr=""></script>
 </html>
